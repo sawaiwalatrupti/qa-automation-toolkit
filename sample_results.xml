@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sample_results.xml — Example JUnit XML test result file
+  Use this to try out report_generator.py:
+    python3 report_generator.py sample_results.xml
+-->
+<testsuites>
+
+  <testsuite name="virtualization.kvm_tests" tests="10" failures="2" errors="1" skipped="1" time="38.452">
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_create_basic" time="2.341"/>
+    <testcase classname="virtualization.kvm_tests" name="test_vm_start_stop" time="4.102"/>
+    <testcase classname="virtualization.kvm_tests" name="test_vm_snapshot" time="6.820"/>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_live_migration" time="12.005">
+      <failure message="AssertionError: VM did not reach running state after migration">
+        AssertionError: VM did not reach running state after migration
+        Expected state: running
+        Actual state:   paused
+        at test_vm_live_migration (test_kvm.py:84)
+      </failure>
+    </testcase>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_memory_balloon" time="3.210"/>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_passthrough_device" time="0.001">
+      <error message="RuntimeError: VFIO device /dev/vfio/0 not found — is the module loaded?">
+        RuntimeError: VFIO device /dev/vfio/0 not found
+        Check: modprobe vfio-pci
+        at test_vm_passthrough_device (test_kvm.py:112)
+      </error>
+    </testcase>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_cpu_pinning" time="2.987"/>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_network_bridge" time="5.432">
+      <failure message="AssertionError: Bridge interface virbr0 not found after VM start">
+        AssertionError: expected virbr0 to be UP, got: not found
+        at test_vm_network_bridge (test_kvm.py:156)
+      </failure>
+    </testcase>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_disk_io" time="1.554">
+      <skipped message="Skipped: large storage device not present in CI environment"/>
+    </testcase>
+
+    <testcase classname="virtualization.kvm_tests" name="test_vm_serial_console" time="0.998"/>
+
+  </testsuite>
+
+  <testsuite name="kernel.module_tests" tests="6" failures="0" errors="0" skipped="0" time="12.100">
+
+    <testcase classname="kernel.module_tests" name="test_module_load_ext4"    time="1.200"/>
+    <testcase classname="kernel.module_tests" name="test_module_load_xfs"     time="1.100"/>
+    <testcase classname="kernel.module_tests" name="test_module_load_overlay" time="0.990"/>
+    <testcase classname="kernel.module_tests" name="test_module_load_vfat"    time="0.880"/>
+    <testcase classname="kernel.module_tests" name="test_module_unload_ext4"  time="4.330"/>
+    <testcase classname="kernel.module_tests" name="test_sysfs_attributes"    time="3.600"/>
+
+  </testsuite>
+
+  <testsuite name="networking.interface_tests" tests="5" failures="1" errors="0" skipped="0" time="9.870">
+
+    <testcase classname="networking.interface_tests" name="test_loopback_up"      time="0.210"/>
+    <testcase classname="networking.interface_tests" name="test_ip_assignment"    time="1.500"/>
+    <testcase classname="networking.interface_tests" name="test_dns_resolution"   time="2.100"/>
+
+    <testcase classname="networking.interface_tests" name="test_ipv6_link_local"  time="4.260">
+      <failure message="AssertionError: IPv6 link-local address not assigned on eth0">
+        AssertionError: expected fe80:: address on eth0, got none
+        Check: sysctl net.ipv6.conf.eth0.disable_ipv6
+        at test_ipv6_link_local (test_net.py:73)
+      </failure>
+    </testcase>
+
+    <testcase classname="networking.interface_tests" name="test_iptables_rules"   time="1.800"/>
+
+  </testsuite>
+
+</testsuites>
