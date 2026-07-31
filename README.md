@@ -17,24 +17,52 @@ A Python tool that parses JUnit XML test result files (produced by pytest, Jenki
 
 ---
 
-## Installation
+## Repository layout
 
-No packages required beyond the Python standard library.
+```
+qa-automation-toolkit/
+├── README.md
+├── Makefile
+└── tests/
+    └── junit-report/
+        ├── report_generator.py     ← entry point
+        ├── sample_results.xml      ← example JUnit XML for quick testing
+        ├── Makefile
+        └── lib/
+            ├── xml_parser.py       ← JUnit XML parsing
+            ├── flaky.py            ← flaky test detection
+            └── reporter.py         ← report generation
+```
+
+> **Requires [testlib-core](https://github.com/sawaiwalatrupti/testlib-core)** cloned alongside this repo for the shared `Colors` utility.
+
+---
+
+## Installation
 
 ```bash
 # Python 3.9+ required
 python3 --version
 
-# Clone the repo
+# Clone this repo and the shared library
 git clone https://github.com/sawaiwalatrupti/qa-automation-toolkit.git
-cd qa-automation-toolkit
+git clone https://github.com/sawaiwalatrupti/testlib-core.git
+
+# Both repos must be in the same parent directory:
+# ~/your-dir/
+# ├── qa-automation-toolkit/
+# └── testlib-core/
 ```
 
 ---
 
 ## Usage
 
+The script lives under `tests/junit-report/`. Run it from there, or pass the path explicitly:
+
 ```bash
+cd tests/junit-report
+
 # Analyse a single result file
 python3 report_generator.py results.xml
 
@@ -49,6 +77,16 @@ python3 report_generator.py results.xml --no-color
 
 # Try it with the included sample file
 python3 report_generator.py sample_results.xml
+```
+
+Or use `make` from the repo root:
+
+```bash
+# Run against the included sample
+make test
+
+# Run against your own files
+make -C tests/junit-report run FILES="run1.xml run2.xml"
 ```
 
 ---
@@ -91,6 +129,7 @@ python3 report_generator.py sample_results.xml
 ## Flaky test detection (multiple runs)
 
 ```bash
+cd tests/junit-report
 python3 report_generator.py monday.xml tuesday.xml wednesday.xml
 ```
 
@@ -119,7 +158,7 @@ If a test fails in some runs but passes in others, it is flagged:
 ```bash
 pip install pytest
 pytest tests/ --junitxml=results.xml
-python3 report_generator.py results.xml
+python3 tests/junit-report/report_generator.py results.xml
 ```
 
 ---
@@ -127,4 +166,5 @@ python3 report_generator.py results.xml
 ## Requirements
 
 - Python 3.9+
-- No external dependencies (uses `xml.etree.ElementTree` from stdlib)
+- [testlib-core](https://github.com/sawaiwalatrupti/testlib-core) cloned as a sibling directory
+- No other external dependencies (uses `xml.etree.ElementTree` from stdlib)
