@@ -23,12 +23,14 @@ A Python tool that parses JUnit XML test result files (produced by pytest, Jenki
 qa-automation-toolkit/
 ├── README.md
 ├── Makefile
+├── run.py                          ← run from repo root (convenience wrapper)
 └── tests/
     └── junit-report/
-        ├── report_generator.py     ← entry point
-        ├── sample_results.xml      ← example JUnit XML for quick testing
         ├── Makefile
+        ├── report_generator.py     ← actual entry point
+        ├── sample_results.xml      ← example JUnit XML for quick testing
         └── lib/
+            ├── __init__.py
             ├── xml_parser.py       ← JUnit XML parsing
             ├── flaky.py            ← flaky test detection
             └── reporter.py         ← report generation
@@ -44,11 +46,11 @@ qa-automation-toolkit/
 # Python 3.9+ required
 python3 --version
 
-# Clone this repo and the shared library
+# Clone this repo and the shared library into the same parent directory
 git clone https://github.com/sawaiwalatrupti/qa-automation-toolkit.git
 git clone https://github.com/sawaiwalatrupti/testlib-core.git
 
-# Both repos must be in the same parent directory:
+# Directory structure should look like:
 # ~/your-dir/
 # ├── qa-automation-toolkit/
 # └── testlib-core/
@@ -56,37 +58,77 @@ git clone https://github.com/sawaiwalatrupti/testlib-core.git
 
 ---
 
-## Usage
+## How to test manually on your Mac
 
-The script lives under `tests/junit-report/`. Run it from there, or pass the path explicitly:
+### Step 1 — clone both repos side by side
 
 ```bash
+mkdir ~/my-own-repos   # or any folder you prefer
+cd ~/my-own-repos
+
+git clone https://github.com/sawaiwalatrupti/qa-automation-toolkit.git
+git clone https://github.com/sawaiwalatrupti/testlib-core.git
+```
+
+### Step 2 — run the sample file (no setup needed)
+
+```bash
+cd ~/my-own-repos/qa-automation-toolkit
+
+# Option A: from repo root using run.py
+python3 run.py tests/junit-report/sample_results.xml
+
+# Option B: cd into the test directory directly
 cd tests/junit-report
-
-# Analyse a single result file
-python3 report_generator.py results.xml
-
-# Analyse multiple runs (enables flaky test detection)
-python3 report_generator.py run1.xml run2.xml run3.xml
-
-# Save report to a file
-python3 report_generator.py results.xml -o summary.txt
-
-# Disable colours (useful for CI logs)
-python3 report_generator.py results.xml --no-color
-
-# Try it with the included sample file
 python3 report_generator.py sample_results.xml
 ```
 
-Or use `make` from the repo root:
+### Step 3 — try the flags
 
 ```bash
-# Run against the included sample
+# from repo root:
+
+# Disable colours (good for piping or CI)
+python3 run.py tests/junit-report/sample_results.xml --no-color
+
+# Save report to a file
+python3 run.py tests/junit-report/sample_results.xml -o /tmp/report.txt
+cat /tmp/report.txt
+
+# Use your own JUnit XML
+python3 run.py /path/to/your/results.xml
+```
+
+### Step 4 — test flaky detection (multiple runs)
+
+```bash
+# Copy the sample to simulate two runs
+cp tests/junit-report/sample_results.xml /tmp/run1.xml
+cp tests/junit-report/sample_results.xml /tmp/run2.xml
+
+python3 run.py /tmp/run1.xml /tmp/run2.xml
+```
+
+### Step 5 — verify exit codes
+
+```bash
+# Should exit 1 (sample has failures)
+python3 run.py tests/junit-report/sample_results.xml --no-color
+echo "Exit code: $?"
+
+# Should exit 2 (file not found)
+python3 run.py nonexistent.xml
+echo "Exit code: $?"
+```
+
+### Step 6 — use make (optional)
+
+```bash
+# From repo root — runs against sample_results.xml
 make test
 
-# Run against your own files
-make -C tests/junit-report run FILES="run1.xml run2.xml"
+# From tests/junit-report/ — run against your own files
+make -C tests/junit-report run FILES="your_results.xml"
 ```
 
 ---
@@ -129,8 +171,7 @@ make -C tests/junit-report run FILES="run1.xml run2.xml"
 ## Flaky test detection (multiple runs)
 
 ```bash
-cd tests/junit-report
-python3 report_generator.py monday.xml tuesday.xml wednesday.xml
+python3 run.py monday.xml tuesday.xml wednesday.xml
 ```
 
 If a test fails in some runs but passes in others, it is flagged:
@@ -157,8 +198,8 @@ If a test fails in some runs but passes in others, it is flagged:
 
 ```bash
 pip install pytest
-pytest tests/ --junitxml=results.xml
-python3 tests/junit-report/report_generator.py results.xml
+pytest my_tests/ --junitxml=results.xml
+python3 run.py results.xml
 ```
 
 ---
