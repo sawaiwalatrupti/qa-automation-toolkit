@@ -26,7 +26,7 @@ No packages required beyond the Python standard library.
 python3 --version
 
 # Clone the repo
-git clone https://github.com/trupti-sawaiwala/qa-automation-toolkit.git
+git clone https://github.com/sawaiwalatrupti/qa-automation-toolkit.git
 cd qa-automation-toolkit
 ```
 
