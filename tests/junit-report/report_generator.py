@@ -13,14 +13,14 @@ import sys
 import argparse
 from pathlib import Path
 
-# Allow imports from bash-test-libs/python and local lib/
+# Allow imports from testlib-core/python and local lib/
 _HERE = Path(__file__).resolve().parent
-_SHARED_LIB = _HERE / '../../../bash-test-libs/python'
+_SHARED_LIB = _HERE / '../../../testlib-core/python'
 
 if not _SHARED_LIB.exists():
     print(
-        f"ERROR: bash-test-libs not found at: {_SHARED_LIB}\n"
-        "       Clone it: git clone https://github.com/sawaiwalatrupti/bash-test-libs.git",
+        f"ERROR: testlib-core not found at: {_SHARED_LIB}\n"
+        "       Clone it: git clone https://github.com/sawaiwalatrupti/testlib-core.git",
         file=sys.stderr,
     )
     sys.exit(1)
@@ -28,7 +28,7 @@ if not _SHARED_LIB.exists():
 sys.path.insert(0, str(_SHARED_LIB))
 sys.path.insert(0, str(_HERE))
 
-from colors import Colors       # from bash-test-libs/python/colors.py
+from colors import Colors       # from testlib-core/python/colors.py
 from lib.reporter import build_report
 
 
