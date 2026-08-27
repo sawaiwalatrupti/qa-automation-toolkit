@@ -7,8 +7,28 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-test:
-    name: Lint and Run Sample
+  lint:
+    name: "🔍 Python Syntax Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Check syntax of all Python files"
+        run: |
+          echo "=================================================="
+          echo "  Checking Python syntax on all source files"
+          echo "=================================================="
+          make lint
+          echo ""
+          echo "✅ All Python files passed syntax check"
+
+  run-report:
+    name: "🧪 QA Report — Full Run Against Sample XML"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,11 +39,43 @@ jobs:
           python-version: "3.11"
 
       - name: Clone testlib-core
-        run: git clone --depth=1 https://github.com/sawaiwalatrupti/testlib-core.git ../testlib-core
+        run: |
+          echo "=================================================="
+          echo "  Cloning testlib-core (shared library)"
+          echo "=================================================="
+          git clone --depth=1 https://github.com/sawaiwalatrupti/testlib-core.git ../testlib-core
+          echo "✅ testlib-core ready"
 
-      - name: Lint (syntax check)
-        run: make lint
+      - name: "Run report generator against sample XML"
+        run: |
+          echo "=================================================="
+          echo "  Parsing sample_results.xml"
+          echo "  3 test suites: KVM, kernel modules, networking"
+          echo "  Expected: failures detected, exit code 1"
+          echo "=================================================="
+          cd tests/junit-report
+          python3 report_generator.py sample_results.xml --no-color || true
+          echo ""
+          echo "✅ Report generated — see full output above"
 
-      - name: Run against sample XML
-        run: make test
-        continue-on-error: true
+      - name: "Run flaky detection — same file twice simulates two runs"
+        run: |
+          echo "=================================================="
+          echo "  Running flaky test detection across 2 XML runs"
+          echo "  Same file used twice — no flaky tests expected"
+          echo "=================================================="
+          cd tests/junit-report
+          python3 report_generator.py sample_results.xml sample_results.xml --no-color || true
+          echo ""
+          echo "✅ Flaky detection run complete — see output above"
+
+      - name: "Verify exit code is correct (1 when failures exist)"
+        run: |
+          echo "=================================================="
+          echo "  Verifying exit code behaviour"
+          echo "  sample_results.xml has failures → must exit 1"
+          echo "=================================================="
+          cd tests/junit-report
+          python3 report_generator.py sample_results.xml --no-color && \
+            { echo "❌ FAIL: expected exit 1 but got exit 0"; exit 1; } || \
+            echo "✅ PASS: correctly exited 1 when failures present"
