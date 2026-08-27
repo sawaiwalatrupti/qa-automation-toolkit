@@ -1,5 +1,7 @@
 # qa-automation-toolkit
 
+![CI](https://github.com/sawaiwalatrupti/qa-automation-toolkit/actions/workflows/ci.yml/badge.svg)
+
 Reads JUnit XML test result files (from pytest, Jenkins, GitHub Actions) and turns them into a clean, human-readable report — so you can quickly see what passed, what failed, and why.
 
 ---
