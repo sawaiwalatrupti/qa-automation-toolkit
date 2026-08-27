@@ -73,7 +73,7 @@ def build_report(files: list[Path], c) -> tuple[list[str], int]:
 
         if result['failures']:
             emit()
-            emit(f"  {c.RED}{c.BOLD}  Failures & Errors:{c.RESET}")
+            emit(f"  {c.RED}{c.BOLD}Failures & Errors:{c.RESET}")
             for i, f in enumerate(result['failures'], 1):
                 tag = f"{c.RED}[{f['type']}]{c.RESET}"
                 emit(f"  {i:>3}. {tag}  {f['class']}::{f['name']}")
