@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Lint and Run Sample
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Clone testlib-core
+        run: git clone --depth=1 https://github.com/sawaiwalatrupti/testlib-core.git ../testlib-core
+
+      - name: Lint (syntax check)
+        run: make lint
+
+      - name: Run against sample XML
+        run: make test
+        continue-on-error: true
